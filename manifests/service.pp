@@ -6,6 +6,7 @@ class jobvacancy::service {
 
   file { ['/var/www/', '/var/www/jobvacancy']:
     ensure => 'directory',
+    mode => "a+w"
   }
 
   wget::fetch { "download-jar":
@@ -13,6 +14,7 @@ class jobvacancy::service {
     destination => '/var/www/jobvacancy/jobvacancy.jar',
     timeout     => 0,
     verbose     => true,
+    require => File['/var/www/', '/var/www/jobvacancy']
     before => Service['jobvacancy']
   }
 
