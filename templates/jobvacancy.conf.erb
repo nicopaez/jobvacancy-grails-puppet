@@ -1,0 +1,33 @@
+# /etc/init/jobvacancy.conf - JobVacancy config
+
+# This example config should work with Ubuntu 12.04+.  It
+# allows you to manage multiple Sidekiq instances with
+# Upstart, Ubuntu's native service management tool.
+#
+# Use the service command:
+#   sudo service clockwork {start,stop,restart,status}
+#
+
+description "Job Vacancy App"
+
+# no "start on", we don't want to automatically start
+stop on (stopping workers or runlevel [06])
+
+# change to match your deployment user
+setuid jobvacancy
+setgid jobvacancy
+
+respawn
+respawn limit 3 30
+
+# normal exit codes, it just respawns.
+normal exit 0 TERM
+
+script
+# this script runs in /bin/sh by default
+# respawn as bash so we can source in rbenv
+exec /bin/bash <<'EOT'
+  cd /var/www/jobvacancy
+  java -jar jobvacancy.jar
+EOT
+end script
